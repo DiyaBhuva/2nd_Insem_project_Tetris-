@@ -16,7 +16,7 @@ Tetris is a tile-matching puzzle game where the player manipulates falling **tet
 This project uses **loops, conditionals, and functions** to create an engaging **Tetris experience** with smooth controls and dynamic difficulty! 🚀
 
 -[installation](#installation)
-
+[`tetris.cpp`](./tetris.cpp).  
 
 -[Game Manual](#Game-Manual)
 
