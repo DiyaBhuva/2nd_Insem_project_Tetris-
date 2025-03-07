@@ -25,7 +25,7 @@ To run our game click on the link given below :
 🟧 When a row is completed, it *disappears*, and the blocks above shift downward.  
 🟩 The game *ends when the stack reaches the top* of the grid.  
 🟥 Speed *increases after every 10 cleared lines*, making the game progressively harder.  
-[🎥 Watch the Demo]()
+[🎥 Watch the Demo](https://github.com/DiyaBhuva/2nd_Insem_project_Tetris-/blob/main/tetris_game%20(1).mp4)
 
 
 
