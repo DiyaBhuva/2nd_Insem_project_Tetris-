@@ -4,7 +4,6 @@
 ## TABLE AND CONTENTS:
 
 -[Description](#Description)
-📜 Description
 
 Tetris is a legendary tile-matching puzzle game where players manipulate falling tetrominoes (shapes made of four blocks) to create complete horizontal lines. Our implementation of Tetris features a 10x20 grid, where pieces spawn at the top and descend gradually. Players can control the tetrominoes using the keyboard to rotate, move left or right, and accelerate their fall.
 
