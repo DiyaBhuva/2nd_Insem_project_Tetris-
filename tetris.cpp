@@ -1,7 +1,7 @@
 #include <iostream>
-#include <fstream>  
-#include <conio.h>  
-#include <windows.h>  
+#include <fstream>
+#include <conio.h>
+#include <windows.h>
 #include <ctime>
 
 using namespace std;
@@ -9,44 +9,72 @@ using namespace std;
 const int WIDTH = 10;
 const int HEIGHT = 20;
 
-char board[HEIGHT][WIDTH];  
+char board[HEIGHT][WIDTH];
 
-int tetrominoes[7][4] = {  
-    1,3,5,7,  
-    2,4,5,7,  
-    3,5,4,6,  
-    3,5,4,7,  
-    2,3,5,7,  
-    3,5,7,6,  
-    2,3,4,5   
+// Tetromino Shapes (Adjusted to Fix Distortions)
+int tetrominoes[7][4] = {
+    {1, 3, 5, 7}, // I
+    {2, 4, 5, 7}, // S
+    {3, 5, 4, 6}, // Z
+    {3, 5, 4, 7}, // T
+    {2, 3, 5, 7}, // L
+    {3, 5, 7, 6}, // J
+    {2, 3, 4, 5}  // O
 };
+
+// Colors for Tetrominoes
+int tetrominoColors[7] = {9, 10, 12, 13, 14, 11, 15};
+class userGuide {
+    public:
+        static void showGuideMenu() {
+            system("cls");
+        
+            cout << "\033[1;34m===== RULES =====\033[0m\n";
+            cout << "- Blocks (Tetrominoes) fall from the top.\n";
+            cout << "- Arrange them to form complete horizontal lines.\n";
+            cout << "- A complete line clears and earns points.\n";
+            cout << "- The game ends when blocks stack to the top.\n\n";
+        
+            cout << "\033[1;32m===== CONTROLS =====\033[0m\n";
+            cout << "Left Arrow  : Move Left\n";
+            cout << "Right Arrow : Move Right\n";
+            cout << "Up Arrow    : Rotate\n";
+            cout << "Down Arrow  : Soft Drop\n";
+            cout << "Space bar   : Hard Drop\n";
+            cout << "ESC         : Pause\n\n";
+        
+            cout << "\033[1;33m===== SCORING METHODS =====\033[0m\n";
+            cout << "- Clearing 1 line  : 100 points\n";
+            cout << "- Clearing 2 lines : 300 points\n";
+            cout << "- Clearing 3 lines : 500 points\n";
+            cout << "- Clearing 4 lines (Tetris) : 800 points\n";
+        
+            cout << "Press any key to start...";
+            _getch();
+            system("cls");
+        }
+        
+    };
 
 struct Point {
     int x, y;
 } a[4], b[4];
 
 bool gameOver = false;
-int currentPiece, color = 1;
+int currentPiece, color;
 int score = 0;
 int highScore = 0;
 
-// Function to read high score from file
 void loadHighScore() {
     ifstream file("highscore.txt");
     if (file.is_open()) {
-        if (file.peek() == EOF) {  // Check if file is empty
-            highScore = 0;
-        } else {
-            file >> highScore;
-            if (file.fail()) highScore = 0;  // If invalid data, reset to 0
-        }
+        file >> highScore;
         file.close();
     } else {
-        highScore = 0;  // If file doesn't exist, set high score to 0
+        highScore = 0;
     }
 }
 
-// Function to save high score
 void saveHighScore() {
     ofstream file("highscore.txt");
     if (file.is_open()) {
@@ -55,28 +83,20 @@ void saveHighScore() {
     }
 }
 
-// Prevents flickering by hiding cursor
 void hideCursor() {
-    CONSOLE_CURSOR_INFO cursorInfo;
-    cursorInfo.bVisible = false;
-    cursorInfo.dwSize = 1;
+    CONSOLE_CURSOR_INFO cursorInfo = {1, false};
     SetConsoleCursorInfo(GetStdHandle(STD_OUTPUT_HANDLE), &cursorInfo);
 }
 
-// Moves the console cursor without clearing the screen
 void gotoXY(int x, int y) {
-    COORD coord;
-    coord.X = x;
-    coord.Y = y;
+    COORD coord = {x, y};
     SetConsoleCursorPosition(GetStdHandle(STD_OUTPUT_HANDLE), coord);
 }
 
-// Sets color for blocks
 void setColor(int color) {
     SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), color);
 }
 
-// Checks if a move is valid
 bool check() {
     for (int i = 0; i < 4; i++) {
         if (a[i].x < 0 || a[i].x >= WIDTH || a[i].y >= HEIGHT || board[a[i].y][a[i].x] != ' ')
@@ -85,18 +105,16 @@ bool check() {
     return true;
 }
 
-// Draws the board without flickering
 void drawBoard() {
     gotoXY(0, 0);
-    cout << "🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱\n";
     for (int i = 0; i < HEIGHT; i++) {
-        cout << "🧱";
+        cout << "💠,";
         for (int j = 0; j < WIDTH; j++) {
             bool isPiece = false;
             for (int k = 0; k < 4; k++) {
                 if (a[k].x == j && a[k].y == i) {
                     setColor(color);
-                    cout << "██";  
+                    cout << "██";
                     setColor(7);
                     isPiece = true;
                     break;
@@ -104,62 +122,90 @@ void drawBoard() {
             }
             if (!isPiece) {
                 if (board[i][j] == ' ') {
-                    cout << "  ";  
+                    setColor(0);
+                    cout << "⬛";
+                    setColor(7);
                 } else {
                     setColor(board[i][j] - '0');
-                    cout << "██";  
+                    cout << "██";
                     setColor(7);
                 }
             }
         }
-        cout << "🧱\n";
+        
+        cout << "💠,\n";
     }
-    cout << "🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱🧱\n";
+    cout << " ═══════════════════════════  \n";
+    if(score>=highScore){
+        cout<< "🥳🥳🥳🥳🥳 𝓦 𝓞 𝓞 𝓗 𝓞 𝓞 🥳🥳🥳🥳 "<< endl;
+        cout<<"You have break your highscore"<<"\n" <<  endl;
+        cout<<" 👹👹👹 🆃 🅴 🆁 🆁 🅸 🅵 🅸 🅲   🅿 🅻 🅰 🆈 🅴 🆁 👹👹👹"<< endl;
+    }
     cout << "Score: " << score << "  High Score: " << highScore << endl;
+    cout << "Controls: ← Move | → Move | ↑ Rotate | ↓ Soft Drop | SPACE Hard Drop | ESC Exit\n";
 }
 
-// Removes full lines
 void clearLines() {
+    int linesCleared = 0;
+
     for (int i = HEIGHT - 1; i >= 0; i--) {
         int count = 0;
         for (int j = 0; j < WIDTH; j++) {
             if (board[i][j] != ' ') count++;
         }
-        if (count == WIDTH) {
+
+        if (count == WIDTH) {  
+            linesCleared++;
+
+            // Move everything down
             for (int k = i; k > 0; k--) {
                 for (int j = 0; j < WIDTH; j++) {
                     board[k][j] = board[k - 1][j];
                 }
             }
-            for (int j = 0; j < WIDTH; j++) board[0][j] = ' ';
-            score += 10;
-            if (score > highScore) {
-                highScore = score;
-                saveHighScore();
+
+            // Clear the top row explicitly
+            for (int j = 0; j < WIDTH; j++) {
+                board[0][j] = ' ';
             }
-            i++;
+
+            i++; // Stay on the same row after shift
         }
+    }
+
+    // Score calculation based on lines cleared
+    if (linesCleared == 1) {
+        score += 100;
+    } else if (linesCleared == 2) {
+        score += 300;
+    } else if (linesCleared == 3) {
+        score += 500;
+    } else if (linesCleared == 4) {
+        score += 800;
+        cout << "\n🎉 TETRIS! 4 LINES CLEARED! 🎉\n";
+    }
+
+    // Update high score
+    if (score > highScore) {
+        highScore = score;
+        saveHighScore();
     }
 }
 
-// Spawns a new piece
+
 void newPiece() {
     currentPiece = rand() % 7;
-    color = 1 + rand() % 6;
+    color = tetrominoColors[currentPiece];
     for (int i = 0; i < 4; i++) {
-        a[i].x = tetrominoes[currentPiece][i] % 2 + WIDTH / 2 - 1;
+        a[i].x = (tetrominoes[currentPiece][i] % 2) + WIDTH / 2 - 1;
         a[i].y = tetrominoes[currentPiece][i] / 2;
     }
     if (!check()) gameOver = true;
 }
-
-// Moves the piece
 void movePiece(int dx, bool rotate) {
     for (int i = 0; i < 4; i++) b[i] = a[i];
-
     for (int i = 0; i < 4; i++) a[i].x += dx;
     if (!check()) for (int i = 0; i < 4; i++) a[i] = b[i];
-
     if (rotate) {
         Point p = a[1];
         for (int i = 0; i < 4; i++) {
@@ -171,11 +217,15 @@ void movePiece(int dx, bool rotate) {
         if (!check()) for (int i = 0; i < 4; i++) a[i] = b[i];
     }
 }
+void hardDrop() {
+    while (check()) {
+        for (int i = 0; i < 4; i++) a[i].y += 1;
+    }
+    for (int i = 0; i < 4; i++) a[i].y -= 1;
+}
 
-// Drops the piece down one step
 void dropPiece() {
     for (int i = 0; i < 4; i++) b[i] = a[i];
-
     for (int i = 0; i < 4; i++) a[i].y += 1;
     if (!check()) {
         for (int i = 0; i < 4; i++) board[b[i].y][b[i].x] = color + '0';
@@ -184,51 +234,53 @@ void dropPiece() {
     }
 }
 
-// Hard drop (instantly drops piece)
-void hardDrop() {
-    while (check()) {
-        for (int i = 0; i < 4; i++) a[i].y += 1;
-    }
-    for (int i = 0; i < 4; i++) a[i] = b[i]; 
-    dropPiece();
-}
-
-// Handles user input
 void handleInput() {
     if (_kbhit()) {
-        char key = _getch();
-        if (key == 27) gameOver = true;
-        if (key == 'a') movePiece(-1, false);
-        if (key == 'd') movePiece(1, false);
-        if (key == 'w') movePiece(0, true);
-        if (key == 's') dropPiece();
-        if (key == ' ') hardDrop();
+        int key = _getch();
+        if (key == 27) {  // ESC Key
+            gameOver = true;
+        } else if (key == 224) { // Arrow Keys
+            key = _getch();
+            if (key == 75) movePiece(-1, false);  // Left Arrow
+            if (key == 77) movePiece(1, false);   // Right Arrow
+            if (key == 72) movePiece(0, true);    // Up Arrow (Rotate)
+            if (key == 80) dropPiece();           // Down Arrow (Soft Drop)
+        } else if (key == 32) {  // Spacebar for Hard Drop
+            hardDrop();
+        }
     }
 }
 
-// Game loop
 void gameLoop() {
-    system("chcp 65001 > nul");  
+    system("chcp 65001 > nul");
     hideCursor();
     srand(time(0));
-
     loadHighScore();
-    system("cls");  
+    userGuide::showGuideMenu();
+    while (true) {
+        score = 0;
+        gameOver = false;
+        for (int i = 0; i < HEIGHT; i++)
+            for (int j = 0; j < WIDTH; j++)
+                board[i][j] = ' ';
 
-    for (int i = 0; i < HEIGHT; i++)
-        for (int j = 0; j < WIDTH; j++)
-            board[i][j] = ' ';
+        newPiece();
 
-    newPiece();
+        while (!gameOver) {
+            drawBoard();
+            handleInput();
+            dropPiece();
+            Sleep(300);
+        }
 
-    while (!gameOver) {
-        drawBoard();
-        handleInput();
-        dropPiece();
-        Sleep(300);
+        cout << "\n 💀💀💀💀 🅶 🅰 🅼 🅴  🅾 🆅 🅴 🆁 💀💀💀💀"<<"\n"<<" Final Score: " <<  score << endl;
+        cout << "Play Again? (Y/N): ";
+        char choice;
+        cin >> choice;
+        if (choice != 'Y' && choice != 'y') break;
     }
 
-    cout << "\nGame Over! Final Score: " << score << endl;
+    cout << "\nThanks for playing!\n";
 }
 
 int main() {
