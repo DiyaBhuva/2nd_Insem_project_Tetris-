@@ -60,9 +60,9 @@ To run our game, click on the link below and execute the file in your C++ enviro
 
 ▶ Move right with D or the Right Arrow.
 
-❌ Press Esc to exit the game anytime.
+❌ Press Esc to pause the game anytime and press 'Y' to resume game or press 'N' to end the game .
 
-🔄 After a game over, an option to play again appears.
+🔄 After the game is over press 'Y' to play again or press 'N' to end the game .
 
 [🎥 Watch the Demo](https://github.com/DiyaBhuva/2nd_Insem_project_Tetris-/blob/main/tetris_game%20(1).mp4)
 
