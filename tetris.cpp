@@ -11,7 +11,7 @@ const int HEIGHT = 20;
 
 char board[HEIGHT][WIDTH];
 
-// Tetromino Shapes (Adjusted to Fix Distortions)
+
 int tetrominoes[7][4] = {
     {1, 3, 5, 7}, // I
     {2, 4, 5, 7}, // S
@@ -22,7 +22,6 @@ int tetrominoes[7][4] = {
     {2, 3, 4, 5}  // O
 };
 
-// Colors for Tetrominoes
 int tetrominoColors[7] = {9, 10, 12, 13, 14, 11, 15};
 class userGuide {
     public:
@@ -157,23 +156,22 @@ void clearLines() {
         if (count == WIDTH) {  
             linesCleared++;
 
-            // Move everything down
+          
             for (int k = i; k > 0; k--) {
                 for (int j = 0; j < WIDTH; j++) {
                     board[k][j] = board[k - 1][j];
                 }
             }
 
-            // Clear the top row explicitly
+           
             for (int j = 0; j < WIDTH; j++) {
                 board[0][j] = ' ';
             }
 
-            i++; // Stay on the same row after shift
+            i++; 
         }
     }
 
-    // Score calculation based on lines cleared
     if (linesCleared == 1) {
         score += 100;
     } else if (linesCleared == 2) {
@@ -185,7 +183,6 @@ void clearLines() {
         cout << "\n🎉 TETRIS! 4 LINES CLEARED! 🎉\n";
     }
 
-    // Update high score
     if (score > highScore) {
         highScore = score;
         saveHighScore();
@@ -237,15 +234,15 @@ void dropPiece() {
 void handleInput() {
     if (_kbhit()) {
         int key = _getch();
-        if (key == 27) {  // ESC Key
+        if (key == 27) {  
             gameOver = true;
-        } else if (key == 224) { // Arrow Keys
+        } else if (key == 224) { 
             key = _getch();
-            if (key == 75) movePiece(-1, false);  // Left Arrow
-            if (key == 77) movePiece(1, false);   // Right Arrow
-            if (key == 72) movePiece(0, true);    // Up Arrow (Rotate)
-            if (key == 80) dropPiece();           // Down Arrow (Soft Drop)
-        } else if (key == 32) {  // Spacebar for Hard Drop
+            if (key == 75) movePiece(-1, false);  
+            if (key == 77) movePiece(1, false);   
+            if (key == 72) movePiece(0, true);    
+            if (key == 80) dropPiece();           
+        } else if (key == 32) {  
             hardDrop();
         }
     }
